@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カレンダー情報表示</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        .calendar-container {
+            height: 90vh;
+            width: 100%;
+        }
+        .soumatou {
+            height: 50vh;
+            background-color: #f0f0f0;
+            padding: 50px;
+            box-sizing: border-box;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .soumatou-text {
+            display: inline-block;
+            animation: scroll 20s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&bgcolor=%23ffffff&ctz=Asia%2FTokyo&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=0&mode=DAY" 
+                style="border-width:0" 
+                width="100%" 
+                height="100%" 
+                frameborder="0" 
+                scrolling="no">
+        </iframe>
+    </div>
+    <div class="soumatou">
+        <div class="soumatou-text">
+            お知らせ: 本日の会議は14:00から会議室Aで開催されます。参加者の皆様は時間厳守でお願いいたします。
+        </div>
+    </div>
+</body>
+</html>
