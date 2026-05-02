@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Room Events</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 { color: #2c3e50; }
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="date"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:hover { background-color: #f1f1f1; }
+        .no-events { text-align: center; padding: 20px; color: #7f8c8d; }
+        .error { color: #e74c3c; font-weight: bold; }
+        .info { font-size: 0.9em; color: #666; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Meeting Room Schedule</h1>
+    
+    <div class="controls">
+        <div class="info">Select a date to view events:</div>
+        <input type="date" id="datePicker">
+        <button onclick="loadEvents()">Load Events</button>
+    </div>
+
+    <div id="status-box">
+        <!-- Status messages will appear here -->
+    </div>
+
+    <table id="event-table" style="display:none;">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Location</th>
+                <th>Event</th>
+                <th>Teacher</th>
+            </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+
+    <script>
+        // 1. Initialize the Date Picker with today's date
+        const today = new Date();
+        // Format YYYY-MM-DD
+        const todayStr = today.toISOString().split('T')[0];
+        
+        document.getElementById('datePicker').value = todayStr;
+        
+        // Load events immediately on page load
+        loadEvents();
+
+        function loadEvents() {
+            const dateInput = document.getElementById('datePicker').value;
+            const statusBox = document.getElementById('status-box');
+            const table = document.getElementById('event-table');
+            const tableBody = document.getElementById('table-body');
+
+            // Clear previous results
+            tableBody.innerHTML = '';
+            statusBox.innerHTML = '<div style="color:#333;">Loading...</div>';
+
+            // Fetch file
+            fetch('event.txt')
+                .then(response => {
+                    if (!response.ok) throw new Error("File not found");
+                    return response.text();
+                })
+                .then(textData => {
+                    const lines = textData.trim().split('\n');
+                    const events = [];
+
+                    lines.forEach(line => {
+                        if (!line.trim()) return; // Skip empty lines
+                        const parts = line.split(',');
+                        
+                        // Check if we have enough columns
+                        if (parts.length >= 6) {
+                            // Check if the file date matches the selected date
+                            if (parts[0] === dateInput) {
+                                events.push({
+                                    date: parts[0],
+                                    start: parts[1],
+                                    end: parts[2],
+                                    location: parts[3],
+                                    name: parts[4],
+                                    teacher: parts[5]
+                                });
+                            }
+                        }
+                    });
+
+                    // Update UI
+                    statusBox.innerHTML = `<strong>${events.length} events found for ${dateInput}</strong>`;
+                    
+                    if (events.length === 0) {
+                        table.style.display = 'none';
+                        statusBox.innerHTML += '<div class="no-events">No events scheduled for this date.</div>';
+                    } else {
+                        table.style.display = 'table';
+                        // Sort by start time
+                        events.sort((a, b) => a.start.localeCompare(b.start));
+                        
+                        events.forEach(evt => {
+                            tableBody.innerHTML += `
+                                <tr>
+                                    <td>${evt.date}</td>
+                                    <td>${evt.start}</td>
+                                    <td>${evt.end}</td>
+                                    <td>${evt.location}</td>
+                                    <td>${evt.name}</td>
+                                    <td>${evt.teacher}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    statusBox.innerHTML = `<div class="error">Error: ${error.message}</div><br><small>Make sure event.txt is in the same folder.</small>`;
+                });
+        }
+    </script>
+</body>
+</html>

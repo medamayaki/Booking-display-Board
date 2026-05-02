@@ -1,0 +1,4 @@
+2026-05-02,09:00,10:00,Room 101,Math Meeting,Mr. Smith
+2026-05-02,11:00,12:30,Lab 202,Science Lab,Ms. Johnson
+2026-05-02,14:00,15:00,Main Hall,General Assembly,Mr. Doe
+2026-05-02,09:00,10:00,Room 101,Future Meeting,Mr. Smith
